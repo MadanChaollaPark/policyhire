@@ -759,4 +759,106 @@ function EmptyJobsState({ onResetFilters }: { onResetFilters: () => void }) {
   )
 }
 
+function CompaniesView({ onNavigate }: { onNavigate: (view: string) => void }) {
+  const [typeFilter, setTypeFilter] = useState('All organisation types')
+  const visibleOrganisations = organisations.filter(
+    (organisation) => typeFilter === 'All organisation types' || organisation.type === typeFilter,
+  )
+
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Company directory"
+        title="Verified EU affairs employers with hiring signals"
+        description="Browse employers by type, policy area, salary transparency, and current hiring velocity."
+        action={
+          <label className="sort-control wide">
+            <Building2 size={16} />
+            <select
+              value={typeFilter}
+              onChange={(event) => setTypeFilter(event.target.value)}
+              aria-label="Filter organisation type"
+            >
+              <option>All organisation types</option>
+              {organisationTypes.map((type) => (
+                <option key={type}>{type}</option>
+              ))}
+            </select>
+          </label>
+        }
+      />
+      <div className="company-grid">
+        {visibleOrganisations.map((organisation) => (
+          <article className="company-card" key={organisation.id}>
+            <div className="company-card-header">
+              <span className="org-logo large">{organisation.logo}</span>
+              <div>
+                <h3>{organisation.name}</h3>
+                <span className="muted">
+                  {organisation.type} · {organisation.city}
+                </span>
+              </div>
+              {organisation.verified && <ShieldCheck size={18} aria-label="Verified employer" />}
+            </div>
+            <p>{organisation.description}</p>
+            <div className="company-metrics">
+              <span>
+                <BriefcaseBusiness size={15} />
+                {organisation.openRoles} roles
+              </span>
+              <span>
+                <TrendingUp size={15} />
+                {organisation.hiringVelocity} velocity
+              </span>
+              <span>
+                <Euro size={15} />
+                {organisation.salaryTransparency}% pay signal
+              </span>
+            </div>
+            <div className="tag-row">
+              {organisation.policyAreas.map((area) => (
+                <span className="tag" key={area}>
+                  {area}
+                </span>
+              ))}
+            </div>
+            <div className="badge-list">
+              {organisation.badges.map((badge) => (
+                <span key={badge}>
+                  <CheckCircle2 size={14} />
+                  {badge}
+                </span>
+              ))}
+            </div>
+            <button className="secondary-button full-width" type="button" onClick={() => onNavigate('jobs')}>
+              View open roles
+              <ChevronRight size={17} />
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+type SectionHeaderProps = {
+  eyebrow: string
+  title: string
+  description: string
+  action?: React.ReactNode
+}
+
+function SectionHeader({ eyebrow, title, description, action }: SectionHeaderProps) {
+  return (
+    <div className="section-header">
+      <div>
+        <span className="eyebrow compact-label">{eyebrow}</span>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </div>
+      {action}
+    </div>
+  )
+}
+
 export default App
