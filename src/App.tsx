@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Upload,
   TrendingUp,
   Users,
   X,
@@ -68,37 +69,107 @@ const defaultFilters: JobFilters = {
   contract: 'All contracts',
   workMode: 'All work modes',
   language: 'All languages',
+  deadline: 'Any deadline',
+  pay: 'Any pay signal',
   sort: 'Most relevant',
+}
+
+const navItems = [
+  ['jobs', 'Jobs'],
+  ['alerts', 'Alerts'],
+  ['saved', 'Saved'],
+  ['profile', 'Profile/CV'],
+  ['companies', 'Companies'],
+  ['intelligence', 'Entities'],
+  ['salary', 'Salary'],
+  ['guides', 'Guides'],
+  ['recruiters', 'Post a Job'],
+  ['admin', 'Admin'],
+]
+
+const routeByView: Record<string, string> = {
+  jobs: '/jobs',
+  alerts: '/alerts',
+  saved: '/saved',
+  profile: '/profile',
+  companies: '/companies',
+  intelligence: '/lobbying-entities',
+  salary: '/fair-pay',
+  guides: '/career-guides',
+  recruiters: '/post-job',
+  admin: '/admin',
+}
+
+const viewByRoute = Object.fromEntries(
+  Object.entries(routeByView).map(([view, path]) => [path, view]),
+)
+
+const routeBase = import.meta.env.BASE_URL.replace(/\/$/, '')
+
+const viewFromPath = () => {
+  const path = window.location.pathname.replace(routeBase, '') || '/jobs'
+  return viewByRoute[path] ?? 'jobs'
 }
 
 function App() {
   const [filters, setFilters] = useState<JobFilters>(defaultFilters)
   const [activeJobId, setActiveJobId] = useState(jobs[0].id)
   const [savedJobs, setSavedJobs] = useState<string[]>(['climate-policy-manager'])
-  const [activeView, setActiveView] = useState('jobs')
+  const [activeView, setActiveView] = useState(viewFromPath)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    if (!mobileFiltersOpen) return
+    if (!mobileFiltersOpen && !mobileMenuOpen) return
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setMobileFiltersOpen(false)
+        setMobileMenuOpen(false)
       }
     }
 
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [mobileFiltersOpen])
+  }, [mobileFiltersOpen, mobileMenuOpen])
+
+  useEffect(() => {
+    const syncRoute = () => setActiveView(viewFromPath())
+
+    window.addEventListener('popstate', syncRoute)
+    return () => window.removeEventListener('popstate', syncRoute)
+  }, [])
 
   const filteredJobs = useMemo(() => {
-    return filterJobs(jobs, filters)
+    let matches = filterJobs(jobs, filters)
+
+    if (filters.deadline === 'Closing this week') {
+      matches = matches.filter((job) => daysUntil(job.deadline) <= 7)
+    }
+
+    if (filters.deadline === 'Closing this month') {
+      matches = matches.filter((job) => daysUntil(job.deadline) <= 30)
+    }
+
+    if (filters.pay === 'Salary disclosed') {
+      matches = matches.filter((job) => job.transparentSalary)
+    }
+
+    if (filters.pay === 'Paid internship') {
+      matches = matches.filter((job) => job.paidInternship)
+    }
+
+    return matches
   }, [filters])
 
-  const activeJob = filteredJobs.find((job) => job.id === activeJobId) ?? filteredJobs[0] ?? jobs[0]
+  const activeJob = filteredJobs.find((job) => job.id === activeJobId) ?? filteredJobs[0]
 
   const updateFilter = (key: keyof JobFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }))
+  }
+
+  const applyFilters = (partial: Partial<JobFilters>) => {
+    setFilters((current) => ({ ...current, ...partial }))
   }
 
   const toggleSavedJob = (jobId: string) => {
@@ -107,16 +178,33 @@ function App() {
     )
   }
 
+  const navigate = (view: string) => {
+    setActiveView(view)
+    setMobileMenuOpen(false)
+    const path = `${routeBase}${routeByView[view] ?? '/jobs'}`
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path)
+    }
+  }
+
   return (
     <main className="app-shell">
       <Header
         activeView={activeView}
+        mobileMenuOpen={mobileMenuOpen}
         savedCount={savedJobs.length}
-        onNavigate={setActiveView}
+        onNavigate={navigate}
+        onToggleMobileMenu={() => setMobileMenuOpen((open) => !open)}
       />
-      <Hero filters={filters} onFilterChange={updateFilter} onNavigate={setActiveView} />
-      <ProductStats />
-      <NavigationTabs activeView={activeView} onNavigate={setActiveView} />
+      <CommandCenter
+        filters={filters}
+        resultCount={filteredJobs.length}
+        savedCount={savedJobs.length}
+        onApplyFilters={applyFilters}
+        onFilterChange={updateFilter}
+        onNavigate={navigate}
+      />
+      <NavigationTabs activeView={activeView} onNavigate={navigate} />
       <section className="workspace" aria-live="polite">
         {activeView === 'jobs' && (
           <JobsView
@@ -132,11 +220,21 @@ function App() {
             onToggleSaved={toggleSavedJob}
           />
         )}
-        {activeView === 'companies' && <CompaniesView onNavigate={setActiveView} />}
+        {activeView === 'alerts' && <AlertsView filters={filters} />}
+        {activeView === 'saved' && (
+          <SavedJobsView
+            savedJobs={savedJobs}
+            onNavigate={navigate}
+            onToggleSaved={toggleSavedJob}
+          />
+        )}
+        {activeView === 'profile' && <ProfileView />}
+        {activeView === 'companies' && <CompaniesView onNavigate={navigate} />}
         {activeView === 'intelligence' && <IntelligenceView />}
         {activeView === 'salary' && <SalaryView />}
         {activeView === 'recruiters' && <RecruiterView />}
         {activeView === 'guides' && <GuidesView />}
+        {activeView === 'admin' && <AdminView />}
       </section>
       <Footer />
     </main>
@@ -145,20 +243,13 @@ function App() {
 
 type HeaderProps = {
   activeView: string
+  mobileMenuOpen: boolean
   savedCount: number
   onNavigate: (view: string) => void
+  onToggleMobileMenu: () => void
 }
 
-function Header({ activeView, savedCount, onNavigate }: HeaderProps) {
-  const navItems = [
-    ['jobs', 'Find Jobs'],
-    ['companies', 'Companies'],
-    ['intelligence', 'Lobbying Intel'],
-    ['salary', 'Fair Pay'],
-    ['recruiters', 'Post a Job'],
-    ['guides', 'Guides'],
-  ]
-
+function Header({ activeView, mobileMenuOpen, savedCount, onNavigate, onToggleMobileMenu }: HeaderProps) {
   return (
     <header className="site-header">
       <button className="brand" type="button" onClick={() => onNavigate('jobs')}>
@@ -182,7 +273,12 @@ function Header({ activeView, savedCount, onNavigate }: HeaderProps) {
         ))}
       </nav>
       <div className="header-actions">
-        <button className="icon-button" type="button" aria-label={`${savedCount} saved jobs`}>
+        <button
+          className="icon-button"
+          type="button"
+          aria-label={`${savedCount} saved jobs`}
+          onClick={() => onNavigate('saved')}
+        >
           <Bookmark size={18} />
           <span>{savedCount}</span>
         </button>
@@ -190,38 +286,67 @@ function Header({ activeView, savedCount, onNavigate }: HeaderProps) {
           <BriefcaseBusiness size={17} />
           Recruit
         </button>
-        <button className="icon-button menu-button" type="button" aria-label="Open menu">
+        <button
+          aria-expanded={mobileMenuOpen}
+          className="icon-button menu-button"
+          type="button"
+          aria-label="Open menu"
+          onClick={onToggleMobileMenu}
+        >
           <Menu size={20} />
         </button>
       </div>
+      {mobileMenuOpen && (
+        <nav className="mobile-nav" aria-label="Mobile navigation">
+          {navItems.map(([id, label]) => (
+            <button
+              aria-current={activeView === id ? 'page' : undefined}
+              className={activeView === id ? 'nav-link active' : 'nav-link'}
+              key={id}
+              type="button"
+              onClick={() => onNavigate(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      )}
     </header>
   )
 }
 
-type HeroProps = {
+type CommandCenterProps = {
   filters: JobFilters
+  resultCount: number
+  savedCount: number
+  onApplyFilters: (partial: Partial<JobFilters>) => void
   onFilterChange: (key: keyof JobFilters, value: string) => void
   onNavigate: (view: string) => void
 }
 
-function Hero({ filters, onFilterChange, onNavigate }: HeroProps) {
+function CommandCenter({
+  filters,
+  resultCount,
+  savedCount,
+  onApplyFilters,
+  onFilterChange,
+  onNavigate,
+}: CommandCenterProps) {
+  const paySignalPercent = Math.round(
+    (jobs.filter((job) => job.transparentSalary || job.salaryEstimate).length / jobs.length) * 100,
+  )
+
   return (
-    <section className="hero-section">
-      <img className="hero-image" src={euCareersBanner} alt="" />
-      <div className="hero-overlay" />
-      <div className="hero-content">
-        <div className="hero-copy">
+    <section className="command-center">
+      <div className="command-main">
+        <div className="command-title">
           <span className="eyebrow">
-            <ShieldCheck size={16} />
-            Verified EU affairs jobs, salaries, and employers
+            <ShieldCheck size={15} />
+            EU affairs hiring workspace
           </span>
-          <h1>Find serious EU policy jobs without the Brussels clutter.</h1>
-          <p>
-            Search public affairs, EU institution, NGO, trade association, law, media, and
-            traineeship roles with salary signals and deadline integrity.
-          </p>
+          <h1>Search verified EU policy jobs, employers, salaries, and lobbying entities.</h1>
         </div>
-        <div className="hero-search" role="search">
+        <div className="command-search" role="search">
           <label className="search-field">
             <Search size={18} />
             <input
@@ -244,6 +369,19 @@ function Hero({ filters, onFilterChange, onNavigate }: HeroProps) {
               ))}
             </select>
           </label>
+          <label className="select-field">
+            <Factory size={18} />
+            <select
+              value={filters.policy}
+              onChange={(event) => onFilterChange('policy', event.target.value)}
+              aria-label="Policy area"
+            >
+              <option>All policy areas</option>
+              {policyAreas.map((area) => (
+                <option key={area}>{area}</option>
+              ))}
+            </select>
+          </label>
           <button className="primary-button" type="button" onClick={() => onNavigate('jobs')}>
             <Search size={18} />
             Search
@@ -255,8 +393,15 @@ function Hero({ filters, onFilterChange, onNavigate }: HeroProps) {
               key={item}
               type="button"
               onClick={() => {
-                if (item === 'Remote EU') onFilterChange('city', 'Remote EU')
-                else onFilterChange('query', item)
+                if (item === 'Paid internships') {
+                  onApplyFilters({ contract: 'Internship', pay: 'Paid internship', query: '' })
+                } else if (item === 'Climate policy') {
+                  onApplyFilters({ policy: 'Climate & Energy', query: '' })
+                } else if (item === 'Remote EU') {
+                  onApplyFilters({ city: 'Remote EU', workMode: 'Remote' })
+                } else if (item === 'Deadline soon') {
+                  onApplyFilters({ deadline: 'Closing this week', sort: 'Deadline soon' })
+                }
                 onNavigate('jobs')
               }}
             >
@@ -265,26 +410,47 @@ function Hero({ filters, onFilterChange, onNavigate }: HeroProps) {
           ))}
         </div>
       </div>
-    </section>
-  )
-}
-
-function ProductStats() {
-  const stats = [
-    ['184', 'verified live roles'],
-    ['642', 'employer profiles'],
-    ['12.7k', 'transparency entities'],
-    ['76%', 'jobs with pay signal'],
-  ]
-
-  return (
-    <section className="stats-band" aria-label="Platform metrics">
-      {stats.map(([value, label]) => (
-        <div className="stat-item" key={label}>
-          <strong>{value}</strong>
-          <span>{label}</span>
+      <div className="command-side">
+        <div className="market-card">
+          <img src={euCareersBanner} alt="" />
+          <div>
+            <span className="eyebrow compact-label">Live market</span>
+            <strong>{resultCount} matching roles</strong>
+            <span>{savedCount} saved · {paySignalPercent}% with pay signal</span>
+          </div>
         </div>
-      ))}
+        <div className="action-grid" aria-label="Candidate and recruiter actions">
+          <button type="button" onClick={() => onNavigate('alerts')}>
+            <Bell size={17} />
+            Alerts
+          </button>
+          <button type="button" onClick={() => onNavigate('profile')}>
+            <Upload size={17} />
+            CV profile
+          </button>
+          <button type="button" onClick={() => onNavigate('companies')}>
+            <Building2 size={17} />
+            Employers
+          </button>
+          <button type="button" onClick={() => onNavigate('recruiters')}>
+            <Megaphone size={17} />
+            Post job
+          </button>
+        </div>
+      </div>
+      <div className="metric-strip" aria-label="Platform metrics">
+        {[
+          [String(jobs.length), 'seeded live roles'],
+          [String(organisations.length), 'employer profiles'],
+          [String(transparencyEntities.length), 'sample entities'],
+          [String(alertPreferences.length), 'alert controls'],
+        ].map(([value, label]) => (
+          <span key={label}>
+            <strong>{value}</strong>
+            {label}
+          </span>
+        ))}
+      </div>
     </section>
   )
 }
@@ -297,11 +463,15 @@ type NavigationTabsProps = {
 function NavigationTabs({ activeView, onNavigate }: NavigationTabsProps) {
   const tabs = [
     ['jobs', Search, 'Jobs'],
+    ['alerts', Bell, 'Alerts'],
+    ['saved', Bookmark, 'Saved'],
+    ['profile', Upload, 'Profile'],
     ['companies', Building2, 'Companies'],
-    ['intelligence', Globe2, 'Intel'],
-    ['salary', Euro, 'Fair Pay'],
-    ['recruiters', Megaphone, 'Recruiters'],
+    ['intelligence', Globe2, 'Entities'],
+    ['salary', Euro, 'Salary'],
     ['guides', FileText, 'Guides'],
+    ['recruiters', Megaphone, 'Post Job'],
+    ['admin', ClipboardCheck, 'Admin'],
   ] as const
 
   return (
@@ -324,7 +494,7 @@ function NavigationTabs({ activeView, onNavigate }: NavigationTabsProps) {
 }
 
 type JobsViewProps = {
-  activeJob: Job
+  activeJob: Job | undefined
   filters: JobFilters
   filteredJobs: Job[]
   mobileFiltersOpen: boolean
@@ -385,11 +555,16 @@ function JobsView({
             </label>
           </div>
         </div>
+        <ActiveFilters
+          filters={filters}
+          onFilterChange={onFilterChange}
+          onResetFilters={onResetFilters}
+        />
         {filteredJobs.length > 0 ? (
           <div className="job-card-list">
             {filteredJobs.map((job) => (
               <JobCard
-                active={job.id === activeJob.id}
+                active={job.id === activeJob?.id}
                 job={job}
                 key={job.id}
                 saved={savedJobs.includes(job.id)}
@@ -402,11 +577,15 @@ function JobsView({
           <EmptyJobsState onResetFilters={onResetFilters} />
         )}
       </section>
-      <JobDetailPanel
-        job={activeJob}
-        saved={savedJobs.includes(activeJob.id)}
-        onToggleSaved={onToggleSaved}
-      />
+      {activeJob ? (
+        <JobDetailPanel
+          job={activeJob}
+          saved={savedJobs.includes(activeJob.id)}
+          onToggleSaved={onToggleSaved}
+        />
+      ) : (
+        <UtilityRail savedCount={savedJobs.length} />
+      )}
       {mobileFiltersOpen && (
         <div className="drawer-backdrop" role="presentation" onClick={() => onToggleMobileFilters(false)}>
           <aside
@@ -437,6 +616,68 @@ function JobsView({
           </aside>
         </div>
       )}
+    </div>
+  )
+}
+
+type ActiveFiltersProps = {
+  filters: JobFilters
+  onFilterChange: (key: keyof JobFilters, value: string) => void
+  onResetFilters: () => void
+}
+
+function ActiveFilters({ filters, onFilterChange, onResetFilters }: ActiveFiltersProps) {
+  const allChips: Array<[keyof JobFilters, string, string]> = [
+    ['city', filters.city, 'All locations'],
+    ['policy', filters.policy, 'All policy areas'],
+    ['category', filters.category, 'All categories'],
+    ['seniority', filters.seniority, 'All seniorities'],
+    ['contract', filters.contract, 'All contracts'],
+    ['workMode', filters.workMode, 'All work modes'],
+    ['language', filters.language, 'All languages'],
+    ['deadline', filters.deadline, 'Any deadline'],
+    ['pay', filters.pay, 'Any pay signal'],
+  ]
+  const chips = allChips.filter(([, value, emptyValue]) => value !== emptyValue)
+
+  if (!filters.query && chips.length === 0) {
+    return (
+      <div className="active-filter-row">
+        <span className="filter-chip neutral">Showing all verified roles</span>
+        <button className="filter-chip action" type="button">
+          <Bell size={14} />
+          Create alert
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="active-filter-row" aria-label="Active filters">
+      {filters.query && (
+        <button
+          className="filter-chip"
+          type="button"
+          onClick={() => onFilterChange('query', '')}
+        >
+          {filters.query}
+          <X size={13} />
+        </button>
+      )}
+      {chips.map(([key, value, emptyValue]) => (
+        <button
+          className="filter-chip"
+          key={`${key}-${value}`}
+          type="button"
+          onClick={() => onFilterChange(key, emptyValue)}
+        >
+          {value}
+          <X size={13} />
+        </button>
+      ))}
+      <button className="filter-chip action" type="button" onClick={onResetFilters}>
+        Clear all
+      </button>
     </div>
   )
 }
@@ -503,6 +744,20 @@ function FiltersPanel({ filters, resultCount, onFilterChange, onResetFilters }: 
         value={filters.language}
         options={['All languages', ...languages]}
         onChange={(value) => onFilterChange('language', value)}
+      />
+      <SelectControl
+        icon={<CalendarDays size={16} />}
+        label="Deadline"
+        value={filters.deadline}
+        options={['Any deadline', 'Closing this week', 'Closing this month']}
+        onChange={(value) => onFilterChange('deadline', value)}
+      />
+      <SelectControl
+        icon={<Euro size={16} />}
+        label="Pay signal"
+        value={filters.pay}
+        options={['Any pay signal', 'Salary disclosed', 'Paid internship']}
+        onChange={(value) => onFilterChange('pay', value)}
       />
       <button className="secondary-button full-width" type="button" onClick={onResetFilters}>
         Reset filters
@@ -723,6 +978,173 @@ function EmptyJobsState({ onResetFilters }: { onResetFilters: () => void }) {
   )
 }
 
+function UtilityRail({ savedCount }: { savedCount: number }) {
+  return (
+    <aside className="utility-rail" aria-label="Candidate tools">
+      <article className="utility-card">
+        <span className="eyebrow compact-label">Candidate tools</span>
+        <h3>Keep your search moving</h3>
+        <div className="mini-metrics">
+          <span><strong>{savedCount}</strong> saved jobs</span>
+          <span><strong>3</strong> active alerts</span>
+          <span><strong>62%</strong> profile strength</span>
+        </div>
+        <button className="secondary-button full-width" type="button">
+          <Bell size={16} />
+          Manage alerts
+        </button>
+      </article>
+      <article className="utility-card">
+        <span className="eyebrow compact-label">Hiring?</span>
+        <h3>Reach EU policy candidates</h3>
+        <p>Featured campaigns include alerts, newsletter placement, and source analytics.</p>
+        <button className="primary-button full-width" type="button">
+          <Megaphone size={16} />
+          Post a job
+        </button>
+      </article>
+    </aside>
+  )
+}
+
+function AlertsView({ filters }: { filters: JobFilters }) {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Alerts"
+        title="Create preference-rich EU affairs job alerts"
+        description="Build alerts from the current search, then tune frequency, salary visibility, seniority, policy area, employer follows, and deadline reminders."
+      />
+      <div className="content-grid">
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Current search</span>
+              <h3>{filters.query || filters.policy.replace('All policy areas', 'All EU policy roles')}</h3>
+            </div>
+            <Bell size={24} />
+          </div>
+          <div className="alert-builder">
+            {[
+              `Location: ${filters.city}`,
+              `Policy: ${filters.policy}`,
+              `Seniority: ${filters.seniority}`,
+              `Pay: ${filters.pay}`,
+              'Frequency: instant, daily, or weekly',
+              'Channels: email, newsletter, deadline reminder',
+            ].map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+            <button className="primary-button full-width" type="button">Create alert</button>
+          </div>
+        </article>
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Alert inbox</span>
+              <h3>3 active alerts</h3>
+            </div>
+            <Mail size={24} />
+          </div>
+          <div className="queue-list">
+            {['Digital policy · Brussels · weekly', 'Climate & Energy · Remote EU · instant', 'Traineeships · paid only · daily'].map((alert) => (
+              <div className="queue-item risk-low" key={alert}>
+                <span>Active</span>
+                <strong>{alert}</strong>
+                <small>Matching roles monitored across jobs, employers, and entities.</small>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  )
+}
+
+function SavedJobsView({
+  savedJobs,
+  onNavigate,
+  onToggleSaved,
+}: {
+  savedJobs: string[]
+  onNavigate: (view: string) => void
+  onToggleSaved: (jobId: string) => void
+}) {
+  const saved = jobs.filter((job) => savedJobs.includes(job.id))
+
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Saved jobs"
+        title="Track saved, applied, interviewing, and archived roles"
+        description="Candidate workflow parity for shortlisting, deadline reminders, notes, and application status."
+        action={<button className="primary-button" type="button" onClick={() => onNavigate('jobs')}>Back to jobs</button>}
+      />
+      {saved.length > 0 ? (
+        <div className="pipeline-grid">
+          {['Saved', 'Applied', 'Interviewing', 'Archived'].map((stage, index) => (
+            <article className="feature-panel" key={stage}>
+              <span className="eyebrow compact-label">{stage}</span>
+              {index === 0 ? saved.map((job) => (
+                <div className="pipeline-card" key={job.id}>
+                  <strong>{job.title}</strong>
+                  <span>{job.organisation} · {job.city}</span>
+                  <small>{salaryLabel(job)} · closes in {daysUntil(job.deadline)} days</small>
+                  <button className="text-button" type="button" onClick={() => onToggleSaved(job.id)}>
+                    Remove
+                  </button>
+                </div>
+              )) : <p className="muted">No roles in this stage yet.</p>}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <EmptyJobsState onResetFilters={() => onNavigate('jobs')} />
+      )}
+    </section>
+  )
+}
+
+function ProfileView() {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="CV profile"
+        title="Candidate profile built for EU affairs recruiting"
+        description="Show policy interests, language profile, institution exposure, salary expectations, visibility, and recruiter discoverability."
+      />
+      <div className="profile-grid">
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Profile strength</span>
+              <h3>62% complete</h3>
+            </div>
+            <Upload size={24} />
+          </div>
+          <div className="range-track profile-track" aria-hidden="true"><span /></div>
+          <div className="check-grid compact-grid">
+            {['CV uploaded', 'Policy interests selected', 'Languages added', 'Salary expectation missing', 'Right-to-work note missing'].map((item) => (
+              <span key={item}><CheckCircle2 size={15} />{item}</span>
+            ))}
+          </div>
+          <button className="primary-button full-width" type="button">Upload CV</button>
+        </article>
+        <article className="feature-panel">
+          <span className="eyebrow compact-label">Recruiter preview</span>
+          <h3>EU digital policy officer</h3>
+          <p>Interests: AI Act, DSA, competition, platform accountability. Languages: English, French. Preferences: Brussels or Remote EU, hybrid, salary disclosed.</p>
+          <div className="tag-row">
+            <span className="tag">Recruiter searchable</span>
+            <span className="tag success">Salary preference visible</span>
+            <span className="tag accent">Open to alerts</span>
+          </div>
+        </article>
+      </div>
+    </section>
+  )
+}
+
 function CompaniesView({ onNavigate }: { onNavigate: (view: string) => void }) {
   const [typeFilter, setTypeFilter] = useState('All organisation types')
   const visibleOrganisations = organisations.filter(
@@ -929,7 +1351,11 @@ function SalaryView() {
               <span>{formatCurrency(band.high)}</span>
             </div>
             <div className="range-track" aria-hidden="true">
-              <span />
+              <span
+                style={{
+                  width: `${Math.round(((band.median - band.low) / (band.high - band.low)) * 100)}%`,
+                }}
+              />
             </div>
             <p>Median sits {Math.round(((band.median - band.low) / (band.high - band.low)) * 100)}% through the observed range.</p>
           </article>
@@ -1133,6 +1559,76 @@ function GuidesView() {
           ))}
         </div>
       </article>
+    </section>
+  )
+}
+
+function AdminView() {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Admin"
+        title="Moderate jobs, employers, salary data, entities, and content"
+        description="Operational parity for approval queues, flagged listings, employer verification, taxonomy hygiene, salary benchmarks, and revenue monitoring."
+      />
+      <div className="metric-grid admin-metrics">
+        {[
+          ['17', 'pending jobs'],
+          ['6', 'flagged listings'],
+          ['42', 'employer updates'],
+          ['EUR 38.4k', 'campaign revenue'],
+        ].map(([value, label]) => (
+          <div className="metric-tile" key={label}>
+            <strong>{value}</strong>
+            <span>{label}</span>
+            <small>Needs review</small>
+          </div>
+        ))}
+      </div>
+      <div className="recruiter-grid">
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Moderation</span>
+              <h3>Review queue</h3>
+            </div>
+            <ClipboardCheck size={24} />
+          </div>
+          <div className="queue-list">
+            {adminQueue.map((item) => (
+              <div className={`queue-item risk-${item.risk.toLowerCase()}`} key={item.id}>
+                <span>{item.type}</span>
+                <strong>{item.label}</strong>
+                <small>{item.status}</small>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Data operations</span>
+              <h3>Quality tooling</h3>
+            </div>
+            <Settings2 size={24} />
+          </div>
+          <div className="check-grid compact-grid">
+            {[
+              'Salary normalization',
+              'Duplicate detection',
+              'Broken apply-link checks',
+              'Entity taxonomy cleanup',
+              'Career-guide CMS',
+              'Employer CRM notes',
+            ].map((item) => (
+              <span key={item}>
+                <CheckCircle2 size={15} />
+                {item}
+              </span>
+            ))}
+          </div>
+        </article>
+      </div>
     </section>
   )
 }

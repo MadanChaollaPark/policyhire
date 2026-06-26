@@ -72,6 +72,8 @@ export interface JobFilters {
   contract: string
   workMode: string
   language: string
+  deadline: string
+  pay: string
   sort: string
 }
 

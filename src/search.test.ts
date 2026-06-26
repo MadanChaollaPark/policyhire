@@ -12,6 +12,8 @@ const baseFilters: JobFilters = {
   contract: 'All contracts',
   workMode: 'All work modes',
   language: 'All languages',
+  deadline: 'Any deadline',
+  pay: 'Any pay signal',
   sort: 'Most relevant',
 }
 
