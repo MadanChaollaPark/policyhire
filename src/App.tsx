@@ -46,6 +46,8 @@ import {
   organisations,
   policyAreas,
   pricingPlans,
+  alertPreferences,
+  postingRequirements,
   recruiterMetrics,
   brusselsBest,
   salaryBands,
@@ -994,6 +996,25 @@ function RecruiterView() {
         <article className="feature-panel">
           <div className="panel-title-row">
             <div>
+              <span className="eyebrow compact-label">Guided posting</span>
+              <h3>Quality score inputs</h3>
+            </div>
+            <ClipboardCheck size={24} />
+          </div>
+          <div className="check-grid compact-grid">
+            {postingRequirements.map((requirement) => (
+              <span key={requirement}>
+                <CheckCircle2 size={15} />
+                {requirement}
+              </span>
+            ))}
+          </div>
+        </article>
+      </div>
+      <div className="recruiter-grid">
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
               <span className="eyebrow compact-label">Moderation queue</span>
               <h3>Quality control</h3>
             </div>
@@ -1057,9 +1078,9 @@ function GuidesView() {
             <Bell size={24} />
           </div>
           <div className="alert-builder">
-            <span>Keywords: climate, public affairs</span>
-            <span>Frequency: instant, daily, weekly</span>
-            <span>Channels: email, newsletter, deadline reminder</span>
+            {alertPreferences.map((preference) => (
+              <span key={preference}>{preference}</span>
+            ))}
             <button className="primary-button full-width" type="button">
               Create alert
             </button>
