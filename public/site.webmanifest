@@ -2,13 +2,13 @@
   "name": "PolicyHire",
   "short_name": "PolicyHire",
   "description": "Verified EU affairs jobs, employer intelligence, and fair-pay signals.",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#f7f9fc",
   "theme_color": "#174ea6",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
