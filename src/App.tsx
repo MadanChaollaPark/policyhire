@@ -171,6 +171,7 @@ function Header({ activeView, savedCount, onNavigate }: HeaderProps) {
       <nav className="top-nav" aria-label="Primary navigation">
         {navItems.map(([id, label]) => (
           <button
+            aria-current={activeView === id ? 'page' : undefined}
             className={activeView === id ? 'nav-link active' : 'nav-link'}
             key={id}
             type="button"
@@ -547,7 +548,12 @@ function JobCard({ active, job, saved, onSelect, onToggleSaved }: JobCardProps) 
 
   return (
     <article className={active ? 'job-card active' : 'job-card'}>
-      <button className="job-main" type="button" onClick={() => onSelect(job.id)}>
+      <button
+        aria-current={active ? 'true' : undefined}
+        className="job-main"
+        type="button"
+        onClick={() => onSelect(job.id)}
+      >
         <span className="org-logo">{job.logo}</span>
         <span className="job-card-copy">
           <span className="job-title-line">
