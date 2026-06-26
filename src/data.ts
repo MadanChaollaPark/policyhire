@@ -862,4 +862,3 @@ export const featureChecklist = [
   'Recruiter dashboard with guided posting, quality score, bulk posting, analytics, invoices, add-ons, and moderation feedback.',
   'SEO package: JobPosting, Organization, BreadcrumbList, Article, FAQ schema, sitemap, robots rules, Open Graph, and canonical URLs.',
 ]
-]
