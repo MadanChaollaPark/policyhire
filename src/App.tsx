@@ -995,4 +995,82 @@ function SalaryView() {
   )
 }
 
+function RecruiterView() {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Recruiter suite"
+        title="Post better EU affairs jobs with transparent performance"
+        description="Guided posting, salary prompts, featured campaigns, alert distribution, hosted apply forms, and moderation feedback."
+      />
+      <div className="pricing-grid">
+        {pricingPlans.map((plan) => (
+          <article className={plan.highlight ? 'pricing-card highlighted' : 'pricing-card'} key={plan.name}>
+            <span className="eyebrow compact-label">{plan.highlight ? 'Most useful' : 'Package'}</span>
+            <h3>{plan.name}</h3>
+            <strong className="price">{plan.price}</strong>
+            <p>{plan.description}</p>
+            <ul>
+              {plan.features.map((feature) => (
+                <li key={feature}>
+                  <CheckCircle2 size={15} />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <div className="tag-row">
+              {plan.addOns.map((addOn) => (
+                <span className="tag accent" key={addOn}>
+                  {addOn}
+                </span>
+              ))}
+            </div>
+            <button className="primary-button full-width" type="button">
+              Start posting
+            </button>
+          </article>
+        ))}
+      </div>
+      <div className="recruiter-grid">
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Campaign analytics</span>
+              <h3>Recruiter dashboard</h3>
+            </div>
+            <BarChart3 size={24} />
+          </div>
+          <div className="metric-grid">
+            {recruiterMetrics.map((metric) => (
+              <div className="metric-tile" key={metric.label}>
+                <strong>{metric.value}</strong>
+                <span>{metric.label}</span>
+                <small>{metric.change}</small>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Moderation queue</span>
+              <h3>Quality control</h3>
+            </div>
+            <Eye size={24} />
+          </div>
+          <div className="queue-list">
+            {adminQueue.map((item) => (
+              <div className={`queue-item risk-${item.risk.toLowerCase()}`} key={item.id}>
+                <span>{item.type}</span>
+                <strong>{item.label}</strong>
+                <small>{item.status}</small>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  )
+}
+
 export default App
