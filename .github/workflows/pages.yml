@@ -28,7 +28,7 @@ jobs:
       - name: Install
         run: npm ci
       - name: Build
-        run: npm run build
+        run: VITE_BASE_PATH="/policyhire/" npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
