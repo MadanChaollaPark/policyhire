@@ -104,6 +104,16 @@ const viewByRoute = Object.fromEntries(
   Object.entries(routeByView).map(([view, path]) => [path, view]),
 )
 
+Object.assign(viewByRoute, {
+  '/brussels-best': 'intelligence',
+  '/internship-calendar': 'guides',
+  '/jobs/brussels': 'jobs',
+  '/jobs/remote-eu': 'jobs',
+  '/jobs/climate-energy': 'jobs',
+  '/jobs/digital-policy': 'jobs',
+  '/jobs/traineeships': 'jobs',
+})
+
 const routeBase = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 const viewFromPath = () => {
