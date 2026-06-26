@@ -516,4 +516,294 @@ export const jobs: Job[] = [
     source: 'Direct employer',
   },
 ]
+
+export const organisations: Organisation[] = [
+  {
+    id: 'clean-grid-europe',
+    name: 'Clean Grid Europe',
+    type: 'Trade association',
+    logo: 'CG',
+    city: 'Brussels',
+    country: 'Belgium',
+    policyAreas: ['Climate & Energy', 'Transport'],
+    openRoles: 3,
+    verified: true,
+    salaryTransparency: 91,
+    hiringVelocity: 'High',
+    followers: '18.4k',
+    website: 'https://example.org/clean-grid',
+    description:
+      'Association representing grid, storage, and electrification companies in EU climate policy.',
+    badges: ['Verified employer', 'Salary disclosed', 'Paid internships'],
+  },
+  {
+    id: 'civic-data-lab',
+    name: 'Civic Data Lab',
+    type: 'NGO',
+    logo: 'CD',
+    city: 'Brussels',
+    country: 'Belgium',
+    policyAreas: ['Digital Policy', 'Democracy'],
+    openRoles: 2,
+    verified: true,
+    salaryTransparency: 96,
+    hiringVelocity: 'Medium',
+    followers: '12.1k',
+    website: 'https://example.org/civic-data',
+    description:
+      'Civil society team working on digital rights, public-interest technology, and AI accountability.',
+    badges: ['Verified NGO', 'Hosted apply', 'Flexible work'],
+  },
+  {
+    id: 'arc-public-affairs',
+    name: 'ARC Public Affairs',
+    type: 'Public affairs',
+    logo: 'AP',
+    city: 'Brussels',
+    country: 'Belgium',
+    policyAreas: ['Health', 'Competition', 'Digital Policy'],
+    openRoles: 5,
+    verified: true,
+    salaryTransparency: 74,
+    hiringVelocity: 'High',
+    followers: '9.8k',
+    website: 'https://example.org/arc-public-affairs',
+    description:
+      'Mid-size Brussels consultancy advising health, technology, and regulated-industry clients.',
+    badges: ['Verified employer', 'Fast response', 'Client secondments'],
+  },
+  {
+    id: 'european-trade-forum',
+    name: 'European Trade Forum',
+    type: 'Think tank',
+    logo: 'ET',
+    city: 'Remote EU',
+    country: 'European Union',
+    policyAreas: ['Trade', 'Development'],
+    openRoles: 1,
+    verified: true,
+    salaryTransparency: 88,
+    hiringVelocity: 'Low',
+    followers: '6.2k',
+    website: 'https://example.org/trade-forum',
+    description:
+      'Research forum producing evidence on trade defence, supply chains, and open strategic autonomy.',
+    badges: ['Remote roles', 'Daily rates disclosed', 'Research led'],
+  },
+  {
+    id: 'european-banking-council',
+    name: 'European Banking Council',
+    type: 'Trade association',
+    logo: 'EB',
+    city: 'Frankfurt',
+    country: 'Germany',
+    policyAreas: ['Financial Services', 'Digital Policy'],
+    openRoles: 2,
+    verified: true,
+    salaryTransparency: 83,
+    hiringVelocity: 'Medium',
+    followers: '21.6k',
+    website: 'https://example.org/banking-council',
+    description:
+      'Financial-sector body engaging EU and supervisory institutions on banking and payments policy.',
+    badges: ['Verified employer', 'Executive exposure', 'Hybrid'],
+  },
+  {
+    id: 'green-mobility-network',
+    name: 'Green Mobility Network',
+    type: 'NGO',
+    logo: 'GM',
+    city: 'Brussels',
+    country: 'Belgium',
+    policyAreas: ['Transport', 'Climate & Energy'],
+    openRoles: 4,
+    verified: true,
+    salaryTransparency: 100,
+    hiringVelocity: 'High',
+    followers: '15.9k',
+    website: 'https://example.org/green-mobility',
+    description:
+      'Coalition campaigning for clean transport, rail investment, and safer urban mobility.',
+    badges: ['Paid internships', 'Transparent pay', 'Coalition work'],
+  },
+]
+
+export const pricingPlans: PricingPlan[] = [
+  {
+    name: 'Basic Listing',
+    price: 'EUR 99',
+    description: 'For one targeted EU affairs vacancy with a clean public job page.',
+    features: [
+      '30 days live',
+      'JobPosting schema',
+      'Employer profile link',
+      'Manual moderation',
+      'Application URL or email',
+    ],
+    addOns: ['Newsletter mention', 'Social repost'],
+  },
+  {
+    name: 'Pro Campaign',
+    price: 'EUR 299',
+    description: 'Featured distribution for priority Brussels and EU policy hiring.',
+    highlight: true,
+    features: [
+      '60 days live',
+      'Featured placement',
+      'Segmented job alerts',
+      'Salary quality prompt',
+      'Performance analytics',
+      '7-day no-application refund review',
+    ],
+    addOns: ['Top employer logo bar', 'Candidate Boost'],
+  },
+  {
+    name: 'Recruiter Suite',
+    price: 'EUR 500',
+    description: 'For repeat recruiters that need bulk tools, branding, and tracking.',
+    features: [
+      '90 days live',
+      'Bulk posting and duplicate jobs',
+      'Custom employer branding',
+      'Hosted apply forms',
+      'ATS source tracking',
+      'Account manager review',
+    ],
+    addOns: ['Newsletter sponsorship', 'Banner campaign'],
+  },
+]
+
+export const salaryBands: SalaryBand[] = [
+  {
+    role: 'Public Affairs Manager',
+    city: 'Brussels',
+    seniority: 'Manager',
+    low: 58000,
+    median: 71000,
+    high: 88000,
+    sample: 146,
+  },
+  {
+    role: 'Policy Officer',
+    city: 'Brussels',
+    seniority: 'Officer',
+    low: 42000,
+    median: 52000,
+    high: 64000,
+    sample: 212,
+  },
+  {
+    role: 'Legal Associate',
+    city: 'Brussels',
+    seniority: 'Senior',
+    low: 76000,
+    median: 94000,
+    high: 125000,
+    sample: 64,
+  },
+  {
+    role: 'EU Trainee',
+    city: 'Brussels',
+    seniority: 'Trainee',
+    low: 1400,
+    median: 1750,
+    high: 2200,
+    sample: 188,
+  },
+]
+
+export const internshipCycles: InternshipCycle[] = [
+  {
+    name: 'Blue Book Traineeship',
+    organiser: 'European Commission',
+    window: 'Applications expected August 2026',
+    start: 'March 2027',
+    paid: true,
+    notes: 'Best for candidates with EU languages, public policy, law, economics, or communications.',
+  },
+  {
+    name: 'Schuman Traineeship',
+    organiser: 'European Parliament',
+    window: 'Applications expected October 2026',
+    start: 'March 2027',
+    paid: true,
+    notes: 'Strong option for parliamentary, communications, legal, and political group experience.',
+  },
+  {
+    name: 'Agency Traineeship Cycle',
+    organiser: 'EU Agencies',
+    window: 'Rolling deadlines by agency',
+    start: 'Rolling',
+    paid: true,
+    notes: 'Track decentralised agencies by policy field, city, and language requirements.',
+  },
+]
+
+export const guides: Guide[] = [
+  {
+    title: 'How to Break Into Brussels Public Affairs in 2026',
+    tag: 'Career Guide',
+    readTime: '9 min',
+    description:
+      'Role ladders, first-job signals, networking channels, and what recruiters expect from junior profiles.',
+  },
+  {
+    title: 'EU Affairs Salary Report: Pay Transparency Before 2027',
+    tag: 'Fair Pay',
+    readTime: '12 min',
+    description:
+      'Benchmarks by role, seniority, policy area, and organisation type, with notes for unpaid internship screening.',
+  },
+  {
+    title: 'Writing Job Ads That Attract Better EU Policy Candidates',
+    tag: 'Recruiter Playbook',
+    readTime: '7 min',
+    description:
+      'A practical checklist for salary ranges, deadlines, languages, visa signals, and non-generic responsibilities.',
+  },
+]
+
+export const adminQueue: AdminQueueItem[] = [
+  {
+    id: 'queue-1',
+    label: 'Unknown Company import: missing logo and salary conflict',
+    type: 'Job review',
+    risk: 'High',
+    status: 'Needs verification',
+  },
+  {
+    id: 'queue-2',
+    label: 'Green Mobility Network internship salary verified',
+    type: 'Salary estimate',
+    risk: 'Low',
+    status: 'Ready to approve',
+  },
+  {
+    id: 'queue-3',
+    label: 'Duplicate policy consultant posting detected',
+    type: 'Report',
+    risk: 'Medium',
+    status: 'Compare apply links',
+  },
+]
+
+export const recruiterMetrics = [
+  { label: 'Qualified applies', value: '2,846', change: '+18%' },
+  { label: 'Alert impressions', value: '184k', change: '+31%' },
+  { label: 'Median apply rate', value: '8.7%', change: '+2.1 pts' },
+  { label: 'Salary disclosed roles', value: '76%', change: '+14 pts' },
+]
+
+export const featureChecklist = [
+  'Advanced search across keyword, city, policy area, seniority, contract, language, salary, deadline, work mode, and organisation type.',
+  'Job detail pages with verified employer data, salary bands, deadline status, source links, share/save actions, and structured sections.',
+  'Job alerts for instant, daily, or weekly delivery with saved-search criteria and employer-follow options.',
+  'Company directory with verified employers, open-role counts, salary transparency, hiring velocity, and policy areas.',
+  'Lobbying and transparency-register intelligence with entity filters, related jobs, and career-guide links.',
+  'Brussels Best style supplier directory for consultancies, law firms, tools, trainers, and policy specialists.',
+  'Fair Pay salary explorer by role, city, seniority, policy area, organisation type, and sample size.',
+  'Internship calendar for EU institutions, agencies, NGOs, embassies, party groups, and recurring traineeships.',
+  'Recruiter dashboard with guided posting, quality score, bulk posting, analytics, invoices, add-ons, and moderation feedback.',
+  'SEO package: JobPosting, Organization, BreadcrumbList, Article, FAQ schema, sitemap, robots rules, Open Graph, and canonical URLs.',
+]
 ]
