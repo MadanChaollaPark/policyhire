@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   BarChart3,
   Bell,
@@ -77,6 +77,19 @@ function App() {
   const [savedJobs, setSavedJobs] = useState<string[]>(['climate-policy-manager'])
   const [activeView, setActiveView] = useState('jobs')
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  useEffect(() => {
+    if (!mobileFiltersOpen) return
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileFiltersOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [mobileFiltersOpen])
 
   const filteredJobs = useMemo(() => {
     return filterJobs(jobs, filters)
