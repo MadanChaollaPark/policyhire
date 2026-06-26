@@ -53,43 +53,11 @@ import {
   transparencyEntities,
   workModes,
 } from './data'
-import type { Job } from './types'
+import { daysUntil, filterJobs, formatCurrency, salaryLabel } from './search'
+import type { Job, JobFilters } from './types'
 import './App.css'
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('en-IE', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(value)
-
-const daysUntil = (date: string) => {
-  const now = new Date('2026-06-27T00:00:00')
-  const deadline = new Date(`${date}T00:00:00`)
-  return Math.ceil((deadline.getTime() - now.getTime()) / 86_400_000)
-}
-
-const salaryLabel = (job: Job) => {
-  if (job.salaryMin && job.salaryMax) {
-    return `${formatCurrency(job.salaryMin)}-${formatCurrency(job.salaryMax)}`
-  }
-
-  return job.salaryEstimate ?? 'Salary not disclosed'
-}
-
-type Filters = {
-  query: string
-  city: string
-  policy: string
-  category: string
-  seniority: string
-  contract: string
-  workMode: string
-  language: string
-  sort: string
-}
-
-const defaultFilters: Filters = {
+const defaultFilters: JobFilters = {
   query: '',
   city: 'All locations',
   policy: 'All policy areas',
@@ -102,56 +70,19 @@ const defaultFilters: Filters = {
 }
 
 function App() {
-  const [filters, setFilters] = useState<Filters>(defaultFilters)
+  const [filters, setFilters] = useState<JobFilters>(defaultFilters)
   const [activeJobId, setActiveJobId] = useState(jobs[0].id)
   const [savedJobs, setSavedJobs] = useState<string[]>(['climate-policy-manager'])
   const [activeView, setActiveView] = useState('jobs')
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const filteredJobs = useMemo(() => {
-    const query = filters.query.trim().toLowerCase()
-    const result = jobs.filter((job) => {
-      const searchable = [
-        job.title,
-        job.organisation,
-        job.city,
-        job.country,
-        job.category,
-        job.seniority,
-        job.contractType,
-        job.workMode,
-        ...job.policyAreas,
-        ...job.languages,
-      ]
-        .join(' ')
-        .toLowerCase()
-
-      return (
-        (!query || searchable.includes(query)) &&
-        (filters.city === 'All locations' || job.city === filters.city) &&
-        (filters.policy === 'All policy areas' || job.policyAreas.includes(filters.policy)) &&
-        (filters.category === 'All categories' || job.category === filters.category) &&
-        (filters.seniority === 'All seniorities' || job.seniority === filters.seniority) &&
-        (filters.contract === 'All contracts' || job.contractType === filters.contract) &&
-        (filters.workMode === 'All work modes' || job.workMode === filters.workMode) &&
-        (filters.language === 'All languages' || job.languages.includes(filters.language))
-      )
-    })
-
-    if (filters.sort === 'Salary high to low') {
-      return result.sort((a, b) => (b.salaryMax ?? 0) - (a.salaryMax ?? 0))
-    }
-
-    if (filters.sort === 'Deadline soon') {
-      return result.sort((a, b) => daysUntil(a.deadline) - daysUntil(b.deadline))
-    }
-
-    return result.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
+    return filterJobs(jobs, filters)
   }, [filters])
 
   const activeJob = filteredJobs.find((job) => job.id === activeJobId) ?? filteredJobs[0] ?? jobs[0]
 
-  const updateFilter = (key: keyof Filters, value: string) => {
+  const updateFilter = (key: keyof JobFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }))
   }
 
@@ -252,8 +183,8 @@ function Header({ activeView, savedCount, onNavigate }: HeaderProps) {
 }
 
 type HeroProps = {
-  filters: Filters
-  onFilterChange: (key: keyof Filters, value: string) => void
+  filters: JobFilters
+  onFilterChange: (key: keyof JobFilters, value: string) => void
   onNavigate: (view: string) => void
 }
 
@@ -378,12 +309,12 @@ function NavigationTabs({ activeView, onNavigate }: NavigationTabsProps) {
 
 type JobsViewProps = {
   activeJob: Job
-  filters: Filters
+  filters: JobFilters
   filteredJobs: Job[]
   mobileFiltersOpen: boolean
   savedJobs: string[]
   onActiveJob: (jobId: string) => void
-  onFilterChange: (key: keyof Filters, value: string) => void
+  onFilterChange: (key: keyof JobFilters, value: string) => void
   onResetFilters: () => void
   onToggleMobileFilters: (open: boolean) => void
   onToggleSaved: (jobId: string) => void
@@ -495,9 +426,9 @@ function JobsView({
 }
 
 type FiltersPanelProps = {
-  filters: Filters
+  filters: JobFilters
   resultCount: number
-  onFilterChange: (key: keyof Filters, value: string) => void
+  onFilterChange: (key: keyof JobFilters, value: string) => void
   onResetFilters: () => void
 }
 
