@@ -371,4 +371,392 @@ function NavigationTabs({ activeView, onNavigate }: NavigationTabsProps) {
   )
 }
 
+type JobsViewProps = {
+  activeJob: Job
+  filters: Filters
+  filteredJobs: Job[]
+  mobileFiltersOpen: boolean
+  savedJobs: string[]
+  onActiveJob: (jobId: string) => void
+  onFilterChange: (key: keyof Filters, value: string) => void
+  onResetFilters: () => void
+  onToggleMobileFilters: (open: boolean) => void
+  onToggleSaved: (jobId: string) => void
+}
+
+function JobsView({
+  activeJob,
+  filters,
+  filteredJobs,
+  mobileFiltersOpen,
+  savedJobs,
+  onActiveJob,
+  onFilterChange,
+  onResetFilters,
+  onToggleMobileFilters,
+  onToggleSaved,
+}: JobsViewProps) {
+  return (
+    <div className="jobs-layout">
+      <FiltersPanel
+        filters={filters}
+        resultCount={filteredJobs.length}
+        onFilterChange={onFilterChange}
+        onResetFilters={onResetFilters}
+      />
+      <section className="results-column" aria-label="Job results">
+        <div className="results-toolbar">
+          <div>
+            <span className="eyebrow compact-label">Live vacancies</span>
+            <h2>{filteredJobs.length} EU affairs roles</h2>
+          </div>
+          <div className="toolbar-actions">
+            <button
+              className="secondary-button mobile-filter-button"
+              type="button"
+              onClick={() => onToggleMobileFilters(true)}
+            >
+              <Filter size={17} />
+              Filters
+            </button>
+            <label className="sort-control">
+              <Settings2 size={16} />
+              <select
+                value={filters.sort}
+                onChange={(event) => onFilterChange('sort', event.target.value)}
+                aria-label="Sort jobs"
+              >
+                <option>Most relevant</option>
+                <option>Salary high to low</option>
+                <option>Deadline soon</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        {filteredJobs.length > 0 ? (
+          <div className="job-card-list">
+            {filteredJobs.map((job) => (
+              <JobCard
+                active={job.id === activeJob.id}
+                job={job}
+                key={job.id}
+                saved={savedJobs.includes(job.id)}
+                onSelect={onActiveJob}
+                onToggleSaved={onToggleSaved}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyJobsState onResetFilters={onResetFilters} />
+        )}
+      </section>
+      <JobDetailPanel
+        job={activeJob}
+        saved={savedJobs.includes(activeJob.id)}
+        onToggleSaved={onToggleSaved}
+      />
+      {mobileFiltersOpen && (
+        <div className="drawer-backdrop" role="presentation" onClick={() => onToggleMobileFilters(false)}>
+          <aside
+            className="filter-drawer"
+            aria-label="Mobile filters"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="drawer-header">
+              <strong>Filters</strong>
+              <button
+                className="icon-button"
+                type="button"
+                aria-label="Close filters"
+                onClick={() => onToggleMobileFilters(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <FiltersPanel
+              filters={filters}
+              resultCount={filteredJobs.length}
+              onFilterChange={onFilterChange}
+              onResetFilters={onResetFilters}
+            />
+            <button className="primary-button full-width" type="button" onClick={() => onToggleMobileFilters(false)}>
+              Apply {filteredJobs.length} results
+            </button>
+          </aside>
+        </div>
+      )}
+    </div>
+  )
+}
+
+type FiltersPanelProps = {
+  filters: Filters
+  resultCount: number
+  onFilterChange: (key: keyof Filters, value: string) => void
+  onResetFilters: () => void
+}
+
+function FiltersPanel({ filters, resultCount, onFilterChange, onResetFilters }: FiltersPanelProps) {
+  return (
+    <aside className="filters-panel" aria-label="Search filters">
+      <div className="panel-heading">
+        <span className="eyebrow compact-label">Facets</span>
+        <strong>{resultCount} matches</strong>
+      </div>
+      <SelectControl
+        icon={<MapPin size={16} />}
+        label="Location"
+        value={filters.city}
+        options={['All locations', ...cities]}
+        onChange={(value) => onFilterChange('city', value)}
+      />
+      <SelectControl
+        icon={<Factory size={16} />}
+        label="Policy area"
+        value={filters.policy}
+        options={['All policy areas', ...policyAreas]}
+        onChange={(value) => onFilterChange('policy', value)}
+      />
+      <SelectControl
+        icon={<Users size={16} />}
+        label="Seniority"
+        value={filters.seniority}
+        options={['All seniorities', ...seniorities]}
+        onChange={(value) => onFilterChange('seniority', value)}
+      />
+      <SelectControl
+        icon={<BriefcaseBusiness size={16} />}
+        label="Contract"
+        value={filters.contract}
+        options={['All contracts', ...contractTypes]}
+        onChange={(value) => onFilterChange('contract', value)}
+      />
+      <SelectControl
+        icon={<Globe2 size={16} />}
+        label="Work mode"
+        value={filters.workMode}
+        options={['All work modes', ...workModes]}
+        onChange={(value) => onFilterChange('workMode', value)}
+      />
+      <SelectControl
+        icon={<Mail size={16} />}
+        label="Language"
+        value={filters.language}
+        options={['All languages', ...languages]}
+        onChange={(value) => onFilterChange('language', value)}
+      />
+      <button className="secondary-button full-width" type="button" onClick={onResetFilters}>
+        Reset filters
+      </button>
+    </aside>
+  )
+}
+
+type SelectControlProps = {
+  icon: React.ReactNode
+  label: string
+  value: string
+  options: string[]
+  onChange: (value: string) => void
+}
+
+function SelectControl({ icon, label, value, options, onChange }: SelectControlProps) {
+  return (
+    <label className="filter-control">
+      <span>
+        {icon}
+        {label}
+      </span>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        {options.map((option) => (
+          <option key={option}>{option}</option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+type JobCardProps = {
+  active: boolean
+  job: Job
+  saved: boolean
+  onSelect: (jobId: string) => void
+  onToggleSaved: (jobId: string) => void
+}
+
+function JobCard({ active, job, saved, onSelect, onToggleSaved }: JobCardProps) {
+  const days = daysUntil(job.deadline)
+
+  return (
+    <article className={active ? 'job-card active' : 'job-card'}>
+      <button className="job-main" type="button" onClick={() => onSelect(job.id)}>
+        <span className="org-logo">{job.logo}</span>
+        <span className="job-card-copy">
+          <span className="job-title-line">
+            <strong>{job.title}</strong>
+            {job.verified && <ShieldCheck size={15} aria-label="Verified employer" />}
+          </span>
+          <span className="muted">{job.organisation}</span>
+          <span className="job-meta">
+            <span>
+              <MapPin size={14} />
+              {job.city}
+            </span>
+            <span>
+              <BriefcaseBusiness size={14} />
+              {job.contractType}
+            </span>
+            <span>
+              <Globe2 size={14} />
+              {job.workMode}
+            </span>
+          </span>
+        </span>
+      </button>
+      <div className="job-card-side">
+        <button
+          className={saved ? 'save-button saved' : 'save-button'}
+          type="button"
+          aria-label={saved ? `Unsave ${job.title}` : `Save ${job.title}`}
+          onClick={() => onToggleSaved(job.id)}
+        >
+          <Heart size={17} fill={saved ? 'currentColor' : 'none'} />
+        </button>
+        <span className={job.transparentSalary ? 'salary-pill verified' : 'salary-pill'}>
+          <Euro size={14} />
+          {salaryLabel(job)}
+        </span>
+        <span className={days <= 7 ? 'deadline-pill urgent' : 'deadline-pill'}>
+          {days > 0 ? `${days} days left` : 'Expired'}
+        </span>
+      </div>
+      <div className="tag-row">
+        {job.policyAreas.slice(0, 3).map((area) => (
+          <span className="tag" key={area}>
+            {area}
+          </span>
+        ))}
+        {job.paidInternship && <span className="tag success">Paid internship</span>}
+        {job.featured && <span className="tag accent">Featured</span>}
+      </div>
+    </article>
+  )
+}
+
+type JobDetailPanelProps = {
+  job: Job
+  saved: boolean
+  onToggleSaved: (jobId: string) => void
+}
+
+function JobDetailPanel({ job, saved, onToggleSaved }: JobDetailPanelProps) {
+  const org = organisations.find((organisation) => organisation.id === job.organisationId)
+
+  return (
+    <aside className="detail-panel" aria-label={`${job.title} details`}>
+      <div className="detail-header">
+        <span className="org-logo large">{job.logo}</span>
+        <div>
+          <span className="eyebrow compact-label">{job.organisation}</span>
+          <h2>{job.title}</h2>
+          <p>{job.summary}</p>
+        </div>
+      </div>
+      <div className="detail-actions">
+        <button className="primary-button" type="button">
+          Apply via {job.applyType}
+          <ExternalLink size={17} />
+        </button>
+        <button className="secondary-button" type="button" onClick={() => onToggleSaved(job.id)}>
+          <Bookmark size={17} fill={saved ? 'currentColor' : 'none'} />
+          {saved ? 'Saved' : 'Save'}
+        </button>
+      </div>
+      <div className="detail-grid">
+        <DetailMetric icon={<Euro size={17} />} label="Salary" value={salaryLabel(job)} />
+        <DetailMetric icon={<CalendarDays size={17} />} label="Deadline" value={job.deadline} />
+        <DetailMetric icon={<MapPin size={17} />} label="Location" value={`${job.city}, ${job.country}`} />
+        <DetailMetric icon={<ShieldCheck size={17} />} label="Right to work" value={job.visaNote} />
+      </div>
+      <section className="detail-section">
+        <h3>Why this matches</h3>
+        <div className="match-list">
+          {job.matchReasons.map((reason) => (
+            <span key={reason}>
+              <Sparkles size={14} />
+              {reason}
+            </span>
+          ))}
+        </div>
+      </section>
+      <DetailList title="Responsibilities" items={job.responsibilities} />
+      <DetailList title="Requirements" items={job.requirements} />
+      <DetailList title="Benefits" items={job.benefits} />
+      {org && (
+        <section className="employer-strip">
+          <div>
+            <span className="eyebrow compact-label">Employer graph</span>
+            <strong>{org.openRoles} open roles</strong>
+            <p>{org.description}</p>
+          </div>
+          <span className="score-ring">{org.salaryTransparency}%</span>
+        </section>
+      )}
+    </aside>
+  )
+}
+
+type DetailMetricProps = {
+  icon: React.ReactNode
+  label: string
+  value: string
+}
+
+function DetailMetric({ icon, label, value }: DetailMetricProps) {
+  return (
+    <div className="detail-metric">
+      {icon}
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  )
+}
+
+type DetailListProps = {
+  title: string
+  items: string[]
+}
+
+function DetailList({ title, items }: DetailListProps) {
+  return (
+    <section className="detail-section">
+      <h3>{title}</h3>
+      <ul>
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function EmptyJobsState({ onResetFilters }: { onResetFilters: () => void }) {
+  return (
+    <section className="empty-state">
+      <Search size={30} />
+      <h2>No roles match this search</h2>
+      <p>Broaden the filters or turn this search into a weekly alert for new listings.</p>
+      <div className="empty-actions">
+        <button className="primary-button" type="button">
+          <Bell size={17} />
+          Create alert
+        </button>
+        <button className="secondary-button" type="button" onClick={onResetFilters}>
+          Clear filters
+        </button>
+      </div>
+    </section>
+  )
+}
+
 export default App
