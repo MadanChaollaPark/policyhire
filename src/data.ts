@@ -794,6 +794,62 @@ export const recruiterMetrics = [
   { label: 'Salary disclosed roles', value: '76%', change: '+14 pts' },
 ]
 
+export const transparencyEntities = [
+  {
+    name: 'European Renewable Alliance',
+    type: 'Trade association',
+    interests: ['Climate & Energy', 'Industrial policy'],
+    country: 'Belgium',
+    registered: '2018',
+    relatedJobs: 6,
+    spend: 'EUR 1.0m-1.25m',
+    hiringSignal: 'Hiring policy and campaigns teams',
+  },
+  {
+    name: 'Digital Rights Observatory',
+    type: 'NGO',
+    interests: ['Digital Policy', 'Democracy'],
+    country: 'Belgium',
+    registered: '2015',
+    relatedJobs: 3,
+    spend: 'EUR 300k-399k',
+    hiringSignal: 'Frequent legal and research fellowships',
+  },
+  {
+    name: 'Food Systems Forum',
+    type: 'Think tank',
+    interests: ['Agriculture', 'Health'],
+    country: 'France',
+    registered: '2021',
+    relatedJobs: 2,
+    spend: 'EUR 100k-199k',
+    hiringSignal: 'Project-funded research roles',
+  },
+]
+
+export const brusselsBest = [
+  {
+    category: 'Public affairs consultancies',
+    count: 184,
+    standout: 'Health, tech, energy, competition, and trade specialists with verified client sectors.',
+  },
+  {
+    category: 'EU law firms',
+    count: 96,
+    standout: 'Competition, state aid, sanctions, privacy, trade defence, and product regulation teams.',
+  },
+  {
+    category: 'Policy intelligence tools',
+    count: 42,
+    standout: 'Legislative monitoring, stakeholder mapping, amendments, and alerting platforms.',
+  },
+  {
+    category: 'Trainers and career coaches',
+    count: 68,
+    standout: 'Interview prep, EU writing, advocacy training, institutional simulation, and language coaching.',
+  },
+]
+
 export const featureChecklist = [
   'Advanced search across keyword, city, policy area, seniority, contract, language, salary, deadline, work mode, and organisation type.',
   'Job detail pages with verified employer data, salary bands, deadline status, source links, share/save actions, and structured sections.',
