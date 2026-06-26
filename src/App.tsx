@@ -1073,4 +1073,104 @@ function RecruiterView() {
   )
 }
 
+function GuidesView() {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Career guides"
+        title="Content that compounds with job search"
+        description="Internship cycles, career guides, salary reports, recruiter playbooks, and SEO-ready long-tail landing pages."
+      />
+      <div className="content-grid">
+        <article className="feature-panel wide-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Internship calendar</span>
+              <h3>Recurring EU traineeship windows</h3>
+            </div>
+            <CalendarDays size={24} />
+          </div>
+          <div className="cycle-list">
+            {internshipCycles.map((cycle) => (
+              <div className="cycle-row" key={cycle.name}>
+                <div>
+                  <strong>{cycle.name}</strong>
+                  <span className="muted">{cycle.organiser}</span>
+                  <p>{cycle.notes}</p>
+                </div>
+                <div>
+                  <span>{cycle.window}</span>
+                  <strong>{cycle.start}</strong>
+                  <small>{cycle.paid ? 'Paid' : 'Unpaid'}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Alerts</span>
+              <h3>Saved search digest</h3>
+            </div>
+            <Bell size={24} />
+          </div>
+          <div className="alert-builder">
+            <span>Keywords: climate, public affairs</span>
+            <span>Frequency: instant, daily, weekly</span>
+            <span>Channels: email, newsletter, deadline reminder</span>
+            <button className="primary-button full-width" type="button">
+              Create alert
+            </button>
+          </div>
+        </article>
+      </div>
+      <div className="guide-grid">
+        {guides.map((guide) => (
+          <article className="guide-card" key={guide.title}>
+            <span className="eyebrow compact-label">{guide.tag}</span>
+            <h3>{guide.title}</h3>
+            <p>{guide.description}</p>
+            <span className="muted">{guide.readTime}</span>
+          </article>
+        ))}
+      </div>
+      <article className="feature-panel">
+        <div className="panel-title-row">
+          <div>
+            <span className="eyebrow compact-label">Launch checklist</span>
+            <h3>Feature parity plus competitive gaps</h3>
+          </div>
+          <Star size={24} />
+        </div>
+        <div className="check-grid">
+          {featureChecklist.map((feature) => (
+            <span key={feature}>
+              <CheckCircle2 size={15} />
+              {feature}
+            </span>
+          ))}
+        </div>
+      </article>
+    </section>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div>
+        <strong>PolicyHire</strong>
+        <span>EU affairs jobs, employer intelligence, and fair-pay signals.</span>
+      </div>
+      <div className="footer-links">
+        <span>JobPosting schema</span>
+        <span>Organization schema</span>
+        <span>Open Graph</span>
+        <span>Robots: search=yes, ai-train=no</span>
+      </div>
+    </footer>
+  )
+}
+
 export default App
