@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import {
   BarChart3,
   Bell,
@@ -81,6 +81,7 @@ type Filters = {
   query: string
   city: string
   policy: string
+  category: string
   seniority: string
   contract: string
   workMode: string
@@ -92,6 +93,7 @@ const defaultFilters: Filters = {
   query: '',
   city: 'All locations',
   policy: 'All policy areas',
+  category: 'All categories',
   seniority: 'All seniorities',
   contract: 'All contracts',
   workMode: 'All work modes',
@@ -128,6 +130,7 @@ function App() {
         (!query || searchable.includes(query)) &&
         (filters.city === 'All locations' || job.city === filters.city) &&
         (filters.policy === 'All policy areas' || job.policyAreas.includes(filters.policy)) &&
+        (filters.category === 'All categories' || job.category === filters.category) &&
         (filters.seniority === 'All seniorities' || job.seniority === filters.seniority) &&
         (filters.contract === 'All contracts' || job.contractType === filters.contract) &&
         (filters.workMode === 'All work modes' || job.workMode === filters.workMode) &&
@@ -520,6 +523,13 @@ function FiltersPanel({ filters, resultCount, onFilterChange, onResetFilters }: 
         onChange={(value) => onFilterChange('policy', value)}
       />
       <SelectControl
+        icon={<BriefcaseBusiness size={16} />}
+        label="Category"
+        value={filters.category}
+        options={['All categories', ...categories]}
+        onChange={(value) => onFilterChange('category', value)}
+      />
+      <SelectControl
         icon={<Users size={16} />}
         label="Seniority"
         value={filters.seniority}
@@ -555,7 +565,7 @@ function FiltersPanel({ filters, resultCount, onFilterChange, onResetFilters }: 
 }
 
 type SelectControlProps = {
-  icon: React.ReactNode
+  icon: ReactNode
   label: string
   value: string
   options: string[]
@@ -709,7 +719,7 @@ function JobDetailPanel({ job, saved, onToggleSaved }: JobDetailPanelProps) {
 }
 
 type DetailMetricProps = {
-  icon: React.ReactNode
+  icon: ReactNode
   label: string
   value: string
 }
@@ -847,7 +857,7 @@ type SectionHeaderProps = {
   eyebrow: string
   title: string
   description: string
-  action?: React.ReactNode
+  action?: ReactNode
 }
 
 function SectionHeader({ eyebrow, title, description, action }: SectionHeaderProps) {
