@@ -15,6 +15,9 @@ Date: 2026-06-27
 - Mobile 390x844: hero/search stacks cleanly, horizontal tab rail works, no horizontal overflow.
 - Mobile filter drawer: Filters button opens drawer; Escape closes drawer.
 - Browser console: no warning or error logs observed.
+- Redesign desktop 1440x900: command center replaces hero, 11 job cards render, parity tabs include Jobs/Alerts/Saved/Profile/Companies/Entities/Salary/Guides/Post Job/Admin, no horizontal overflow.
+- Redesign mobile 390x844: menu opens and closes with Escape, Jobs route shows filter button and 11 cards, mobile filter drawer opens/closes with Escape, no horizontal overflow.
+- Direct route check: `/jobs` and `/post-job` route into the SPA locally.
 
 ## Notes
 
