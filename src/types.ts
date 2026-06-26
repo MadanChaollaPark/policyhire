@@ -63,6 +63,18 @@ export interface Job {
   source: string
 }
 
+export interface JobFilters {
+  query: string
+  city: string
+  policy: string
+  category: string
+  seniority: string
+  contract: string
+  workMode: string
+  language: string
+  sort: string
+}
+
 export interface Organisation {
   id: string
   name: string
