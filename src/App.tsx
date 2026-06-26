@@ -939,4 +939,60 @@ function IntelligenceView() {
   )
 }
 
+function SalaryView() {
+  const transparentJobs = jobs.filter((job) => job.transparentSalary || job.salaryEstimate)
+
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Fair Pay"
+        title="Salary signals that go beyond static bands"
+        description="Compare role, city, seniority, sample size, and listing-level pay disclosure before applying."
+      />
+      <div className="salary-grid">
+        {salaryBands.map((band) => (
+          <article className="salary-card" key={`${band.role}-${band.city}`}>
+            <div className="panel-title-row">
+              <div>
+                <h3>{band.role}</h3>
+                <span className="muted">
+                  {band.city} · {band.seniority} · {band.sample} samples
+                </span>
+              </div>
+              <Euro size={22} />
+            </div>
+            <div className="salary-range">
+              <span>{formatCurrency(band.low)}</span>
+              <strong>{formatCurrency(band.median)}</strong>
+              <span>{formatCurrency(band.high)}</span>
+            </div>
+            <div className="range-track" aria-hidden="true">
+              <span />
+            </div>
+            <p>Median sits {Math.round(((band.median - band.low) / (band.high - band.low)) * 100)}% through the observed range.</p>
+          </article>
+        ))}
+      </div>
+      <article className="feature-panel">
+        <div className="panel-title-row">
+          <div>
+            <span className="eyebrow compact-label">Disclosure-first jobs</span>
+            <h3>{transparentJobs.length} current listings with pay signals</h3>
+          </div>
+          <LineChart size={24} />
+        </div>
+        <div className="pay-table">
+          {transparentJobs.slice(0, 6).map((job) => (
+            <div className="pay-row" key={job.id}>
+              <span>{job.title}</span>
+              <strong>{salaryLabel(job)}</strong>
+              <small>{job.organisation}</small>
+            </div>
+          ))}
+        </div>
+      </article>
+    </section>
+  )
+}
+
 export default App
