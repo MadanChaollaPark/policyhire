@@ -764,3 +764,161 @@
   border: 0;
   box-shadow: none;
 }
+
+.company-grid,
+.supplier-grid,
+.guide-grid,
+.pricing-grid,
+.salary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.company-card,
+.supplier-card,
+.guide-card,
+.pricing-card,
+.salary-card,
+.feature-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.company-card-header,
+.panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.company-card h3,
+.supplier-card h3,
+.guide-card h3,
+.pricing-card h3,
+.salary-card h3,
+.feature-panel h3 {
+  margin: 0;
+}
+
+.company-card p,
+.supplier-card p,
+.guide-card p,
+.pricing-card p,
+.salary-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.company-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.company-metrics span {
+  align-items: flex-start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8fafc;
+}
+
+.badge-list span {
+  color: #17603f;
+  background: #e9f7ef;
+  border-radius: 999px;
+  padding: 6px 9px;
+}
+
+.intelligence-grid,
+.content-grid,
+.recruiter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 16px;
+}
+
+.wide-panel {
+  min-width: 0;
+}
+
+.feature-panel {
+  background: #fff;
+}
+
+.feature-panel .panel-title-row svg,
+.salary-card .panel-title-row svg {
+  color: #174ea6;
+}
+
+.entity-list,
+.queue-list,
+.cycle-list,
+.pay-table,
+.alert-builder,
+.check-list {
+  display: grid;
+  gap: 10px;
+}
+
+.entity-row,
+.cycle-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(170px, 0.35fr);
+  gap: 16px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.entity-row strong,
+.entity-row span,
+.cycle-row strong,
+.cycle-row span {
+  display: block;
+}
+
+.entity-side,
+.cycle-row > div:last-child {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.entity-side strong,
+.cycle-row > div:last-child strong {
+  color: var(--ink);
+}
+
+.check-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.supplier-card {
+  border-left: 4px solid #1f8a70;
+}
+
+.count-badge {
+  width: fit-content;
+  color: #174ea6;
+  background: #edf4ff;
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  color: #174ea6;
+  cursor: pointer;
+  font-weight: 750;
+  padding: 0;
+}
