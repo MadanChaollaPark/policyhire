@@ -47,8 +47,10 @@ import {
   policyAreas,
   pricingPlans,
   recruiterMetrics,
+  brusselsBest,
   salaryBands,
   seniorities,
+  transparencyEntities,
   workModes,
 } from './data'
 import type { Job } from './types'
@@ -858,6 +860,82 @@ function SectionHeader({ eyebrow, title, description, action }: SectionHeaderPro
       </div>
       {action}
     </div>
+  )
+}
+
+function IntelligenceView() {
+  return (
+    <section className="section-stack">
+      <SectionHeader
+        eyebrow="Lobbying intelligence"
+        title="Turn directories into hiring intelligence"
+        description="Search EU Transparency Register style entities, related jobs, public-affairs suppliers, and career-guide pathways from one place."
+      />
+      <div className="intelligence-grid">
+        <article className="feature-panel wide-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Entity search</span>
+              <h3>12,688 mapped entities</h3>
+            </div>
+            <Globe2 size={24} />
+          </div>
+          <div className="entity-list">
+            {transparencyEntities.map((entity) => (
+              <div className="entity-row" key={entity.name}>
+                <div>
+                  <strong>{entity.name}</strong>
+                  <span className="muted">
+                    {entity.type} · {entity.country} · registered {entity.registered}
+                  </span>
+                  <div className="tag-row">
+                    {entity.interests.map((interest) => (
+                      <span className="tag" key={interest}>
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="entity-side">
+                  <span>{entity.spend}</span>
+                  <strong>{entity.relatedJobs} related jobs</strong>
+                  <small>{entity.hiringSignal}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="feature-panel">
+          <div className="panel-title-row">
+            <div>
+              <span className="eyebrow compact-label">Quality checks</span>
+              <h3>No ghost jobs queue</h3>
+            </div>
+            <ClipboardCheck size={24} />
+          </div>
+          <ul className="check-list">
+            <li>Duplicate apply-link detection</li>
+            <li>Expired deadline sweeps</li>
+            <li>Unpaid internship warnings</li>
+            <li>Salary contradiction review</li>
+            <li>AI-generated application blocking flag</li>
+          </ul>
+        </article>
+      </div>
+      <div className="supplier-grid">
+        {brusselsBest.map((item) => (
+          <article className="supplier-card" key={item.category}>
+            <span className="count-badge">{item.count}</span>
+            <h3>{item.category}</h3>
+            <p>{item.standout}</p>
+            <button className="text-button" type="button">
+              Browse category
+              <ChevronRight size={16} />
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }
 
