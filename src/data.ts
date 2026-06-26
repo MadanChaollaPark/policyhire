@@ -850,6 +850,28 @@ export const brusselsBest = [
   },
 ]
 
+export const postingRequirements = [
+  'Job title',
+  'Company and verified employer profile',
+  'Category, seniority, contract type, and work mode',
+  'City, country, remote eligibility, and right-to-work note',
+  'Salary range or salary-estimate justification',
+  'Application URL or email route',
+  'Hiring contact name, email, and phone',
+  'Expiry date and moderation notes',
+  'Up to four policy tags',
+  'Block AI-generated applications flag',
+]
+
+export const alertPreferences = [
+  'Keyword and employer-follow alerts',
+  'Policy area, seniority, contract, and location filters',
+  'Salary-disclosed-only toggle',
+  'Deadline-soon reminders',
+  'Instant, daily, weekly, and newsletter frequencies',
+  'Anonymous saved search migration after signup',
+]
+
 export const featureChecklist = [
   'Advanced search across keyword, city, policy area, seniority, contract, language, salary, deadline, work mode, and organisation type.',
   'Job detail pages with verified employer data, salary bands, deadline status, source links, share/save actions, and structured sections.',
